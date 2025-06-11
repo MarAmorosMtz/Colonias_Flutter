@@ -1,6 +1,8 @@
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_application/pantallas/PantallaCamara.dart';
+import 'package:flutter_application/pantallas/PantallaPreview.dart';
 import 'package:flutter_application/Styles/styles.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 
@@ -19,6 +21,9 @@ class _PantallaInicioState extends State<PantallaInicio> with TickerProviderStat
   late final List<AnimationController> _controllers;
   late final List<Animation<Offset>> _slideAnimations;
   late final List<Animation<double>> _fadeAnimations;
+
+  final ImagePicker _picker = ImagePicker();
+  XFile? _image;
 
   @override
   void initState() {
@@ -159,10 +164,7 @@ class _PantallaInicioState extends State<PantallaInicio> with TickerProviderStat
                 icon: Icons.camera_alt,
                 text: "Cámara",
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const PantallaCamara()),
-                  );
+                  getImageFromCamera();
                 },
               ),
               space,
@@ -171,7 +173,7 @@ class _PantallaInicioState extends State<PantallaInicio> with TickerProviderStat
                 icon: Icons.photo_library,
                 text: "Galería",
                 onPressed: () {
-                  // Acción galería
+                  getImageFromGallery();
                 },
               ),
               space,
@@ -188,5 +190,38 @@ class _PantallaInicioState extends State<PantallaInicio> with TickerProviderStat
         ),
       ),
     );
+  }
+
+  Future getImageFromGallery() async{
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      _image = image;
+    });
+
+    if (image != null) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PantallaPreview(image: File(image.path)),
+      ),
+    );
+  }
+  }
+
+  Future getImageFromCamera() async{
+    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+
+    setState(() {
+      _image = image;
+    });
+    if (image != null) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PantallaPreview(image: File(image.path)),
+      ),
+    );
+    }
   }
 }

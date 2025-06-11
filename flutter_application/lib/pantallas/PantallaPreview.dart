@@ -1,78 +1,43 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/Styles/styles.dart';
-//import 'package:gallery_saver/gallery_saver.dart';
-//import 'package:flutter/services.dart'; // Para mostrar SnackBar
+import 'package:flutter_application/pantallas/PantallaAnalisis.dart';
 
 class PantallaPreview extends StatelessWidget {
-  final String imagePath;
+  final File image;
 
-  const PantallaPreview({super.key, required this.imagePath});
-
-  Future<void> _guardarImagen(String path, BuildContext context) async {
-    /*try {
-      bool? success = await GallerySaver.saveImage(path);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(success == true ? 'Imagen guardada en galería' : 'Error al guardar imagen'),
-          backgroundColor: success == true ? Colors.green : Colors.red,
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error al guardar imagen: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }*/
-  }
+  const PantallaPreview({super.key, required this.image});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: light,
       appBar: AppBar(
-        title: const Text('Vista previa'),
+        backgroundColor: light,
+        title: const Text('Vista previa', style: TextStyle(
+          color: darker
+        ),),
       ),
       body: Column(
         children: [
           Expanded(
             child: Center(
-              child: Image.file(File(imagePath)),
+              child: Image.file(image),
             ),
           ),
           const SizedBox(height: 24), 
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () => _guardarImagen(imagePath, context),
-                    icon: const Icon(Icons.save_alt, size: 28, color: medium,),
-                    label: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                      child: Text(
-                        'Guardar',
-                        style: TextStyle(fontSize: 18, color: medium),
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: darker,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: ElevatedButton.icon(
                     onPressed: () {
-                      // Acción para analizar
-                      print('Analizando imagen en $imagePath');
-                      // Aquí puedes agregar navegación o lógica de análisis
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => PantallaAnalisis(image:File(image.path)))
+                      );
                     },
                     icon: const Icon(Icons.analytics, size: 28, color: medium,),
                     label: const Padding(
@@ -93,7 +58,7 @@ class PantallaPreview extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 32), // Espacio al final
+          const SizedBox(height: 40),
         ],
       ),
     );
