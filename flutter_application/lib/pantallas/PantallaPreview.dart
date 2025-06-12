@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/Styles/styles.dart';
 import 'package:flutter_application/pantallas/PantallaAnalisis.dart';
+import 'package:flutter_application/pantallas/DetectionPage.dart';
 
 class PantallaPreview extends StatelessWidget {
   final File image;
@@ -36,7 +37,8 @@ class PantallaPreview extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => PantallaAnalisis(image:File(image.path)))
+                        //MaterialPageRoute(builder: (context) => PantallaAnalisis(image:File(image.path)))
+                        MaterialPageRoute(builder: (context) => DetectionPage())
                       );
                     },
                     icon: const Icon(Icons.analytics, size: 28, color: medium,),

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/Styles/styles.dart';
+//import 'package:flutter_application/pantallas/colonias_detector.dart';
 //import 'package:graphic/graphic.dart' as graphic;
 
 class PantallaAnalisis extends StatelessWidget{

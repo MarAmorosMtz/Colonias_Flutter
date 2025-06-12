@@ -9,9 +9,9 @@ class DetectionPage extends StatefulWidget {
 class _DetectionPageState extends State<DetectionPage> {
   Future<DetectionResult>? _detectionFuture;
 
-  void _detectColonies(String imagePath) {
+  void _detectColonies() {
     setState(() {
-      _detectionFuture = ColoniesDetector.detect(imagePath);
+      _detectionFuture = ColoniesDetector.detect("D:/RosaWoo/fuente/HCL001R.jpg");
     });
   }
 
@@ -52,6 +52,6 @@ class _DetectionPageState extends State<DetectionPage> {
   }
 
   void _pickImage() async {
-    // Implementa la selección de imagen usando image_picker
+    _detectColonies();
   }
 }

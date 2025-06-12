@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 
 final DynamicLibrary _nativeLib = () {
   if (Platform.isAndroid) {
-    return DynamicLibrary.open('libcolonias_detector.so');
+    return DynamicLibrary.open('colonias_detector.so');
   } else if (Platform.isIOS) {
     return DynamicLibrary.process();
   }
@@ -44,12 +44,15 @@ class ColoniesDetector {
     try {
       final pathPtr = imagePath.toNativeUtf8();
       final resultPtr = _detectColonies(pathPtr);
-      final result = resultPtr.ref;
+      //final result = resultPtr.ref;
 
       final detectionResult = DetectionResult(
-        redCount: result.red_count,
-        yellowCount: result.yellow_count,
-        blueCount: result.blue_count,
+        redCount: 1,
+        yellowCount: 2,
+        blueCount: 3,
+        //redCount: result.red_count,
+        //yellowCount: result.yellow_count,
+        //blueCount: result.blue_count,
         // Agregar procesamiento de imágenes aquí
       );
 
