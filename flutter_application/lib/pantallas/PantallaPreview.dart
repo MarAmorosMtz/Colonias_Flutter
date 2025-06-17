@@ -37,8 +37,7 @@ class PantallaPreview extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        //MaterialPageRoute(builder: (context) => PantallaAnalisis(image:File(image.path)))
-                        MaterialPageRoute(builder: (context) => DetectionPage())
+                        MaterialPageRoute(builder: (context) => PantallaAnalisis(image:File(image.path)))
                       );
                     },
                     icon: const Icon(Icons.analytics, size: 28, color: medium,),
