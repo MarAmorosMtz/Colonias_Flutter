@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/Styles/styles.dart';
 import 'package:flutter_application/pantallas/PantallaAnalisis.dart';
-import 'package:flutter_application/pantallas/DetectionPage.dart';
 
 class PantallaPreview extends StatelessWidget {
   final File image;
