@@ -5,6 +5,11 @@ import 'package:flutter_application/Styles/styles.dart';
 import 'package:dio/dio.dart';
 import 'RestAPI.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
+import 'package:flutter/rendering.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'dart:ui' as ui;
+import 'package:device_info_plus/device_info_plus.dart';
 
 class PantallaAnalisis extends StatefulWidget {
   final File image;
@@ -18,12 +23,14 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
   Uint8List? imagenBytes;
   late Dio dio;
   Map<String, dynamic>? analysisResults;
+  GlobalKey _globalKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
     dio = Dio();
     subirImagen(widget.image.path);
+    //PermissionUtil.requestAll();
   }
 
   Future<void> subirImagen(String image) async {
@@ -71,7 +78,6 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
   }
 
   Widget _buildPieChart() {
-  // Si no hay datos o todos los valores son cero, mostramos un mensaje
   if (analysisResults == null ||
       (analysisResults!['red_colonies'] == 0 &&
           analysisResults!['blue_colonies'] == 0 &&
@@ -83,27 +89,26 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
     );
   }
 
-  // Colores mejorados
   final redColor = Colors.red[300]!;
   final blueColor = Colors.blue[300]!;
   final brownColor = Colors.brown[300]!;
   final borderColor = Colors.white;
   final double radius_anchor = 40;
   return SizedBox(
-    height: 180, // Altura reducida
+    height: 180,
     child: Stack(
       children: [
         PieChart(
           PieChartData(
-            startDegreeOffset: -90, // Rotación para empezar desde arriba
-            sectionsSpace: 2, // Pequeño espacio entre secciones
-            centerSpaceRadius: 50, // Radio del espacio central
+            startDegreeOffset: -90,
+            sectionsSpace: 2,
+            centerSpaceRadius: 50,
             sections: [
               PieChartSectionData(
                 color: redColor,
                 value: analysisResults!['red_colonies'].toDouble(),
                 title: '${analysisResults!['red_colonies']}',
-                radius: radius_anchor, // Radio más pequeño para hacerlo delgado
+                radius: radius_anchor,
                 titleStyle: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -174,9 +179,8 @@ class _PantallaAnalisisState extends State<PantallaAnalisis> {
   );
 }
 
-// Versión mejorada de la leyenda
+
 Widget _buildLegend() {
-  // Colores que coinciden con el gráfico
   final redColor = Colors.red[300]!;
   final blueColor = Colors.blue[300]!;
   final brownColor = Colors.brown[300]!;
@@ -222,14 +226,19 @@ Widget _buildLegendItem(Color color, String text) {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: light,
       appBar: AppBar(
-        title: Text('Análisis'),
-        backgroundColor: dark,
+        title: Text('Análisis', style: TextStyle(
+          color: darker
+        ),),
+        backgroundColor: light,
       ),
-      body: SingleChildScrollView(  // Envolvemos todo el contenido en un SingleChildScrollView
+      body: SingleChildScrollView(
         child: Column(
           children: [
-            Center(
+            RepaintBoundary(
+              key: _globalKey,
+              child: Center(
               child: imagenBytes != null
                   ? Image.memory(imagenBytes!)
                   : Column(
@@ -240,6 +249,7 @@ Widget _buildLegendItem(Color color, String text) {
                         Text('Procesando imagen...')
                       ],
                     ),
+            ),
             ),
             SizedBox(height: 16),
             _buildPieChart(),
@@ -261,54 +271,68 @@ Widget _buildLegendItem(Color color, String text) {
                   SizedBox(height: 8),
                   Text('Total de colonias: ${analysisResults?['total_colonies'] ?? 0}'),
                   SizedBox(height: 16),
-                  Text(
-                    'Detalle de Colonias',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      _saveLocalImage();
+                    },
+                    child: Text('Guardar Imagen'),
                   ),
-                  SizedBox(height: 8),
-                  if (analysisResults != null)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Colonias rojas: ${analysisResults!['red_colonies']}'),
-                        Text('Colonias azules: ${analysisResults!['blue_colonies']}'),
-                        Text('Colonias marrones: ${analysisResults!['brown_colonies']}'),
-                      ],
-                    ),
+                  ),
                 ],
               ),
             ),
-            SizedBox(height: 60), // Espacio adicional al final para mejor desplazamiento
-          ],
-        ),
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              child: Text("Header"),
-              decoration: BoxDecoration(color: dark),
-            ),
-            ListTile(
-              title: Text("Total"),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Text("item 2"),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            )
+            SizedBox(height: 60),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _saveLocalImage() async {
+    // Verificar versión de Android
+    final androidInfo = await DeviceInfoPlugin().androidInfo;
+    final isAndroid13OrHigher = androidInfo.version.sdkInt >= 33;
+
+    // Solicitar permiso según versión
+    PermissionStatus status;
+    if (isAndroid13OrHigher) {
+      status = await Permission.photos.request(); // Para Android 13+
+    } else {
+      status = await Permission.storage.request(); // Para Android <13
+    }
+    if (!status.isGranted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Permiso denegado para guardar imagen')),
+      );
+      return;
+    }
+
+    try {
+      RenderRepaintBoundary boundary =
+          _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+
+      if (byteData != null) {
+        final result = await ImageGallerySaverPlus.saveImage(
+          byteData.buffer.asUint8List(),
+          quality: 100,
+          name: "colonia_analisis_${DateTime.now().millisecondsSinceEpoch}",
+        );
+        print("Imagen guardada: $result");
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Imagen guardada exitosamente')),
+        );
+      }
+    } catch (e) {
+      print("Error al guardar imagen: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error al guardar imagen')),
+      );
+    }
   }
 
   @override

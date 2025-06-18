@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application/pantallas/PantallaPreview.dart';
 import 'package:flutter_application/Styles/styles.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
 
 class PantallaInicio extends StatefulWidget {
   const PantallaInicio({super.key});
@@ -23,6 +22,7 @@ class _PantallaInicioState extends State<PantallaInicio> with TickerProviderStat
   late final List<Animation<double>> _fadeAnimations;
 
   final ImagePicker _picker = ImagePicker();
+  // ignore: unused_field
   XFile? _image;
 
   @override
@@ -136,28 +136,12 @@ class _PantallaInicioState extends State<PantallaInicio> with TickerProviderStat
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Bienvenido a E.Coli Scan',
+              Text('Bienvenido a Kárhiri',
                     style: TextStyle(
                       fontSize: 30.0,
                       fontWeight: FontWeight.bold,
                       color: dark,
                     )),
-              AnimatedTextKit(
-                animatedTexts: [
-                  FadeAnimatedText(
-                    'Bienvenido a E.Coli Scan',
-                    textStyle: TextStyle(
-                      fontSize: 30.0,
-                      fontWeight: FontWeight.bold,
-                      color: dark,
-                    ),
-                    duration: const Duration(milliseconds: 1500),
-                  ),
-                ],
-                totalRepeatCount: 1,
-                isRepeatingAnimation: false,
-                pause: const Duration(milliseconds: 500),
-              ),
               space,
               buildAnimatedButton(
                 index: 0,
@@ -182,7 +166,7 @@ class _PantallaInicioState extends State<PantallaInicio> with TickerProviderStat
                 icon: Icons.info_outline,
                 text: "Información",
                 onPressed: () {
-                  // Acción información
+
                 },
               ),
             ],
